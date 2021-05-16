@@ -19,7 +19,7 @@ if (fs.existsSync(FILE)) {
 }
 
 function shouldGet() {
-    if(cached && cached.fetched) {
+    if (cached && cached.fetched) {
         return moment(cached.fetched).isBefore(moment().subtract(4, 'hours')) &&
             (!lastTry || lastTry.isBefore(moment().subtract(5, 'minutes')))
     } else {
@@ -29,7 +29,7 @@ function shouldGet() {
 
 app.get('/forecasts', (req, res) => {
     res.set('Content-Type', 'application/json')
-    if(shouldGet()) {
+    if (shouldGet()) {
         got.post(config.authUrl, {
             responseType: 'json',
             headers: {
@@ -42,16 +42,21 @@ app.get('/forecasts', (req, res) => {
                 headers: {
                     Authorization: "Bearer " + result.body.access_token
                 }
-            })
+            },
+                err => console.error("auth failed", err))
         }).then(result => {
             cached = {
                 fetched: moment().format(),
                 available: result.headers['x-ratelimit-available'],
                 forecasts: result.body
             }
-            fs.writeFile(FILE, JSON.stringify(cached), ()=>{})
+            console.log("update successful")
+            fs.writeFile(FILE, JSON.stringify(cached), () => { })
             res.send(JSON.stringify(cached))
         }, err => {
+            if(err.response.statusCode != 429) {
+                console.error(err.message)
+            }
             res.send(JSON.stringify(cached))
         })
     } else {
