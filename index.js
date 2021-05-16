@@ -7,11 +7,12 @@ const fs = require('fs')
 
 const app = express()
 const port = 3001
+const FILE = '/tmp/forecasts.json'
 
 var cached = {}
 
-if (fs.existsSync('forecasts.json')) {
-    fs.readFile('forecasts.json', (err, data) => {
+if (fs.existsSync(FILE)) {
+    fs.readFile(FILE, (err, data) => {
         cached = JSON.parse(data)
     })
 }
@@ -46,7 +47,7 @@ app.get('/forecasts', (req, res) => {
                 available: result.headers['x-ratelimit-available'],
                 forecasts: result.body
             }
-            fs.writeFile('forecasts.json', JSON.stringify(cached), ()=>{})
+            fs.writeFile(FILE, JSON.stringify(cached), ()=>{})
             res.send(JSON.stringify(cached))
         }, err => {
             console.log(err.message)
