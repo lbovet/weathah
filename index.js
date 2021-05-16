@@ -37,7 +37,6 @@ app.get('/forecasts', (req, res) => {
             }
         }).then(result => {
             lastTry = moment()
-            console.log('trying')
             return got.get(config.forecastUrl, {
                 responseType: 'json',
                 headers: {
@@ -53,11 +52,9 @@ app.get('/forecasts', (req, res) => {
             fs.writeFile(FILE, JSON.stringify(cached), ()=>{})
             res.send(JSON.stringify(cached))
         }, err => {
-            console.log(err.message)
             res.send(JSON.stringify(cached))
         })
     } else {
-        console.log('returning cached data')
         res.send(JSON.stringify(cached))
     }
 })
