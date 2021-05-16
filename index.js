@@ -10,19 +10,18 @@ const port = 3001
 
 var cached = {}
 
-fs.readFile('forecasts.json', (err, data) => {
-    cached = JSON.parse(data)
-})
+if (fs.existsSync('forecasts.json')) {
+    fs.readFile('forecasts.json', (err, data) => {
+        cached = JSON.parse(data)
+    })
+}
 
 function shouldGet() {
     if(cached && cached.fetched) {
-        if(moment(cached.fetched).isBefore(moment().subtract(4, 'hours'))) {
-            return true
-        }
+        return moment(cached.fetched).isBefore(moment().subtract(4, 'hours'))
     } else {
         return true
     }
-    return false
 }
 
 app.get('/forecasts', (req, res) => {
