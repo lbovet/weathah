@@ -42,9 +42,10 @@ app.get('/forecasts', (req, res) => {
                 headers: {
                     Authorization: "Bearer " + result.body.access_token
                 }
-            },
-                err => console.error("auth failed", err))
-        }).then(result => {
+            })
+        },
+            err => console.error("auth failed", err)
+        ).then(result => {
             cached = {
                 fetched: moment().format(),
                 available: result.headers['x-ratelimit-available'],
@@ -54,7 +55,7 @@ app.get('/forecasts', (req, res) => {
             fs.writeFile(FILE, JSON.stringify(cached), () => { })
             res.send(JSON.stringify(cached))
         }, err => {
-            if(err.response.statusCode != 429) {
+            if (err.response.statusCode != 429) {
                 console.error(err.message)
             }
             res.send(JSON.stringify(cached))
