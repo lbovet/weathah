@@ -10,6 +10,7 @@ const port = 3001
 const FILE = '/tmp/forecasts.json'
 
 var cached = {}
+var lastTry = null
 
 if (fs.existsSync(FILE)) {
     fs.readFile(FILE, (err, data) => {
@@ -19,7 +20,8 @@ if (fs.existsSync(FILE)) {
 
 function shouldGet() {
     if(cached && cached.fetched) {
-        return moment(cached.fetched).isBefore(moment().subtract(4, 'hours'))
+        return moment(cached.fetched).isBefore(moment().subtract(4, 'hours')) &&
+            (!lastTry || lastTry.isBefore(moment().subtract(5, 'minutes')))
     } else {
         return true
     }
@@ -34,7 +36,8 @@ app.get('/forecasts', (req, res) => {
                 Authorization: "Basic " + config.credentials
             }
         }).then(result => {
-            console.log('token: ' + result.body.access_token)
+            lastTry = moment()
+            console.log('trying')
             return got.get(config.forecastUrl, {
                 responseType: 'json',
                 headers: {
