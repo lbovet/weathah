@@ -65,6 +65,11 @@ app.get('/forecasts', (req, res) => {
     }
 })
 
+app.get('/measures', (req, res) => {
+    res.set('Content-Type', 'application/json')
+    got.get(config.measuresUrl).then(result => res.send(result.body))
+})
+
 app.listen(port, () => {
     console.log(`Weathah listening at http://localhost:${port}`)
 })
