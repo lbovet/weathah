@@ -105,5 +105,4 @@ dist
 
 .vscode/
 
-config.js
 forecasts.json
